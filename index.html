@@ -10,7 +10,7 @@
 <style>
     .parent {
         height: 250px;
-        width: 500px;
+        /* width: 500px; */
         background-color: rgb(198, 212, 240);
         overflow-x: scroll;
         /*flex: 0 0 240px;
@@ -99,6 +99,7 @@
         <h2>単語帳入力</h2>
         <form onsubmit="showAlert(); return false;">
             日本語の意味： <input type="text" id="japanese" placeholder="りんご" />
+            <br>
             英単語： <input type="text" id="english" placeholder="apple" />
             <br>
             <input type="submit" value="保存" />
