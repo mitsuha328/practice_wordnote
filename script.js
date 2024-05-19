@@ -1,37 +1,97 @@
 let wordList = []
 const storage = localStorage;
 let shuffledArray = wordList;
+let quizList = []
 
 function showAlert() {
     wordList.push({
         Japan: japanese.value,
         America: english.value
     })
-    // console.log('hello');
     shuffledArray = wordList;
+    document.getElementById('japanese').value = '';
+    document.getElementById('english').value = '';
     if (check_quiz === 1) {
         alert('内容が変更されたため、単語練習帳を終了します。');
         resetQuiz();
     }
-    showList();
+    showList(shuffledArray);
     storage.store = JSON.stringify(wordList);
 }
 addEventListener('load', function () {
-    /*const data = storedData ? 
-    JSON.parse(storedData) : [];*/
     if (storage.store === undefined) {
     } else {
         wordList = JSON.parse(storage.store);
         shuffledArray = wordList;
-        showList();
+        showList(shuffledArray);
     }
 }
 );
 
+
+
+function searchWord() {
+    const Search = document.getElementById('search');
+    const KeyWord = document.getElementById('key-word').value;
+    const Message_button = document.createElement('button');
+    document.getElementById('message_btn').appendChild(Message_button);
+    Message_button.style.display = 'none';
+    const Message = document.getElementById('message');
+
+    Search.style.display = 'none';
+    let is_found = false;
+    Message_button.textContent = '終了する'
+    Message_button.style.display = 'block';
+    for (const key of wordList) {
+        if (key.Japan === KeyWord || key.America === KeyWord) {
+            const KeyCard_1 = document.createElement('button');
+            document.getElementById('key-card.ja').appendChild(KeyCard_1);
+            const KeyCard_2 = document.createElement('button');
+            document.getElementById('key-card.eg').appendChild(KeyCard_2);
+
+            is_found = true;
+            KeyCard_1.textContent = key.Japan;
+            KeyCard_2.textContent = key.America
+            KeyCard_1.style.display = 'block';
+            KeyCard_2.style.display = 'block';
+            KeyCard_1.addEventListener('click', function () {
+                remove(KeyWord, 'Japan');
+                resetSearch();
+            });
+            KeyCard_2.addEventListener('click', function () {
+                remove(KeyWord, 'Japan');
+                resetSearch();
+            });
+        }
+    }
+    if (!is_found) {
+        Message.style.display = 'block';
+        Message.textContent = `${KeyWord}は単語帳に存在しません。`
+    }
+
+    Message_button.addEventListener('click', function () {
+        resetSearch();
+    });
+
+    document.getElementById('key-word').value = '';
+
+
+    function resetSearch() {
+        // KeyCard_1.style.display = 'none';
+        // KeyCard_2.style.display = 'none';
+        document.getElementById('key-card.ja').innerHTML = "";
+        document.getElementById('key-card.eg').innerHTML = "";
+        Search.style.display = 'block';
+        Message.style.display = 'none';
+        Message_button.style.display = 'none';
+    }
+}
+
+
+
 const quizContainer = document.getElementById('quiz-container');
 const questionElement = document.getElementById('question');
 const answerInput = document.getElementById('answer-input');
-//const submitButton = document.getElementById('submit-btn');
 const replyElement = document.getElementById('reply');
 const endElement = document.getElementById('end');
 let currentQuestionIndex = 0;
@@ -42,7 +102,7 @@ const Second = document.getElementsByClassName('second-class');
 const finishButton = document.createElement('button');
 document.getElementById('finish-btn').appendChild(finishButton);
 finishButton.textContent = '終了する';
-finishButton.style.display = ' none';
+finishButton.style.display = 'none';
 let check_quiz = 0;
 
 const endButton = document.createElement('button');
@@ -65,7 +125,7 @@ document.getElementById('shuffle-btn').appendChild(shuffleButton);
 shuffleButton.textContent = 'シャッフルする';
 shuffleButton.addEventListener('click', function () {
     shuffledArray = shuffleArray(wordList);
-    showList();
+    showList(shuffledArray);
     if (check_quiz === 1) {
         alert('内容が変更されたため、単語練習帳を終了します。');
         resetQuiz();
@@ -89,7 +149,7 @@ document.getElementById('reset-btn').appendChild(resetButton);
 resetButton.textContent = 'リセットする';
 resetButton.addEventListener('click', function () {
     shuffledArray = wordList;
-    showList();
+    showList(shuffledArray);
     if (check_quiz === 1) {
         alert('内容が変更されたため、単語練習帳を終了します。');
         resetQuiz();
@@ -121,8 +181,6 @@ function showNextQuestion() {
         endButton.style.display = 'none';
         check_quiz = 0;
         shuffledArray = wordList;
-        //alert('クイズ終了！');
-        // resetQuiz();
     }
 }
 
@@ -145,6 +203,8 @@ function resetQuiz() {
     endButton.style.display = 'none';
     check_quiz = 0;
     shuffledArray = wordList;
+    quizList = [];
+    showList(shuffledArray);
 }
 
 const submitButton = document.createElement('button');
@@ -163,14 +223,12 @@ function Check() {
 
     if (userAnswer === correctAnswer) {
         replyElement.textContent = '正解!';
-        //alert('正解！');
         submitButton.style.display = 'none';
         nextButton.style.display = 'block';
         count += 1;
         right += 1;
     } else {
         replyElement.textContent = `不正解。正解は「${shuffledArray[currentQuestionIndex].America}」です。`;
-        //alert(`不正解。正解は「${wordList[currentQuestionIndex].America}」です。`);
         submitButton.style.display = 'none';
         nextButton.style.display = 'block';
         count += 1;
@@ -188,9 +246,8 @@ nextButton.addEventListener('click', function () {
 document.getElementById('next').appendChild(nextButton);
 
 function showQuestion() {
-    //console.log(wordList);
     const currentQuestion = shuffledArray[currentQuestionIndex];
-    questionElement.textContent = currentQuestion.Japan;
+    questionElement.textContent = (`問題：${currentQuestion.Japan}`);
     answerInput.value = '';
 }
 
@@ -198,10 +255,13 @@ function showQuestion() {
 const startButton = document.createElement('button');
 startButton.textContent = 'スタート';
 answerInput.style.display = 'none';
-// quizContainer.style.display = 'none';
-//nextButton.style.display = 'none';
 startButton.addEventListener('click', function () {
     if (shuffledArray.length > 0) {
+        for (let i = 0; i < shuffledArray.length; i++) {
+            let newItem = { Japan: shuffledArray[i].Japan, America: '×' };
+            quizList.push(newItem);
+        }
+        showList(quizList);
         startButton.style.display = 'none';
         quizContainer.style.display = 'block';
         nextButton.style.display = 'none';
@@ -221,67 +281,45 @@ document.getElementById('start').appendChild(startButton);
 
 
 
-function showList() {
-    //console.log(wordList);
+function showList(List) {
     let memo1_element = document.getElementById('memo_1');//memoを呼び出している
     let memo2_element = document.getElementById('memo_2')
 
     memo1_element.innerHTML = '';//memoのコードの中身そのものをまっさらにする
     memo2_element.innerHTML = '';
 
-    for (const item of shuffledArray) {
-        //let item=wordList[wordList.length-1]
+    for (const item of List) {
         let ja_element = document.createElement('p');//p要素作る
         ja_element.id = item.Japan
         ja_element.classList.add('word_card')
         ja_element.innerText = item.Japan
-        ja_element.innerHTML = `<button onclick="remove(event, 'Japan')" id=btn>${item.Japan}</button>`
-        //new_element = 'wordList[wordList.length-1].Japan';
+        ja_element.innerHTML = `<button onclick="remove('${item.Japan}', 'Japan')" id=btn>${item.Japan}</button>`
         memo1_element.prepend(ja_element);//memoにnew_elementを追加
-
-        /*let btn_ja = ja_element.querySelector('button');
-        //btn_ja.addEventListener('click', remove);
-        btn_ja.addEventListener('click', (event) => remove(event, 'Japan'));*/
 
         let eg_element = document.createElement('p');//p要素作る
         eg_element.id = item.America
         eg_element.classList.add('word_card')
         eg_element.innerText = item.America
-        eg_element.innerHTML = `<button onclick="remove(event, 'America')" id=btn>${item.America}</button>`
-        // new_element = 'wordList[wordList.length-1].America';
+        eg_element.innerHTML = `<button onclick="remove('${item.America}', 'America')" id=btn>${item.America}</button>`
         memo2_element.prepend(eg_element);//memoにnew_elementを追加
-
-        /*let btn_eg = eg_element.querySelector('button');
-        //btn_eg.addEventListener('click', remove);
-        btn_eg.addEventListener('click', (event) => remove(event, 'America'));*/
     }
-    //isShowListCalledByRemove = false;
 }
 
 
-
-function remove(event, language) {
-    /*const parentElement = event.target.parentElement;
-    console.log(parentElement);
-    parentElement.remove();*/
-    //console.log('Hello');
+//remove関数はボタンのp要素(親)ごと消す
+function remove(card, language) {
     const question = confirm('このカードを削除しますか?');
     if (question == true) {
-        const parentElement = event.target.parentElement;
-        const word = parentElement.id;
+        // const parentElement = event.target.parentElement;
+        const word = card;
 
-        // Find the index of the item in the wordList array
         const index = wordList.findIndex(item => item[language] == word);
 
-        // Remove the item from the wordList array
         if (index !== -1) {
             wordList.splice(index, 1);
         }
 
-        // Remove the parent element from the DOM
-        parentElement.remove();
 
-        // If both Japan and America entries are present, remove the counterpart as well
         //languageの値がJapanならAmericaをそうでなければJapanを返す
         const counterpartLanguage = language === 'Japan' ? 'America' : 'Japan';
         const counterpartIndex = wordList.findIndex(item => item[counterpartLanguage] == word);
@@ -291,8 +329,6 @@ function remove(event, language) {
         }
 
         shuffledArray = wordList;
-        //console.log(wordList);
-        //isShowListCalledByRemove = true;
 
         if (check_quiz === 1) {
             alert('内容が変更されたため、単語練習帳を終了します。');
@@ -302,7 +338,7 @@ function remove(event, language) {
         storage.store === undefined
         storage.store = JSON.stringify(wordList);
 
-        showList();
+        showList(shuffledArray);
     }
     else {
     }
