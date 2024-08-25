@@ -10,13 +10,9 @@
 <style>
     .parent {
         height: 250px;
-        width: 400px;
+        width: 500px;
         background-color: rgb(198, 212, 240);
         overflow-x: scroll;
-        /*flex: 0 0 240px;
-        display: flex;*/
-        /*display: grid;横並びにする時に使う
-        grid-template-columns: repeat(3, 1fr);*/
     }
 
     .child {
@@ -52,6 +48,34 @@
         border: 8px double #0090bb;
         height: 120px;
         width: 200px;
+        white-space: nowrap;
+        overflow-x: scroll;
+    }
+
+    #card {
+        background-color: #efeef8;
+        font-size: 1.0rem;
+        font-weight: 350;
+        line-height: 0.75;
+        position: relative;
+        display: inline-block;
+        /*padding: 1rem 4rem;*/
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-transition: all 0.3s;
+        transition: all 0.3s;
+        text-align: center;
+        vertical-align: middle;
+        text-decoration: none;
+        letter-spacing: 0.1em;
+        color: #212529;
+        border-radius: 0.5rem;
+        border: 4px double #0b147b;
+        height: 60px;
+        width: 100px;
         /*white-space: nowrap;*/
     }
 
@@ -87,44 +111,122 @@
         gap: 5px;
     }
 
-    /* .second-class {
+
+    .image {
+        border: 2px solid rgb(1, 24, 82);
+        /* 枠線 */
+        border-radius: 0.25em;
+        /* 角丸 */
+        padding: 0.5em;
+        /* 内側の余白量 */
+        background-color: rgb(251, 252, 253);
+        /* 背景色 */
+        width: 160px;
+        /* 横幅 */
+        height: 25px;
+        /* 高さ */
+        font-size: 1em;
+        /* 文字サイズ */
+        line-height: 1.2;
+        /* 行の高さ */
+    }
+
+    .response {
+        border: 2px solid rgb(1, 24, 82);
+        border-radius: 0.25em;
+        padding: 0.5em;
+        background-color: rgb(251, 252, 253);
+        width: 200px;
+        height: 25px;
+        font-size: 1em;
+        line-height: 1.2;
+    }
+
+    .font {
+        font-size: 20px;
+    }
+
+    .flame {
+        height: 50px;
+        width: 500px;
         display: flex;
-        gap: 5px;
-    } */
+        background-color: rgb(248, 224, 246, 0.808);
+        border-left: 7px solid rgb(252, 193, 252);
+    }
+
+    .prc_word {
+        white-space: nowrap;
+        height: 40px;
+        width: 240px;
+        font-size: 1.6rem;
+        margin-left: 5px;
+        background-color: rgb(215, 236, 253);
+        margin-top: 5px;
+        display: flex;
+        align-items: center;
+        overflow-x: scroll;
+        scrollbar-width: thin;
+    }
+
+    .flame-card {
+        font-size: 20px;
+        margin-left: 5px;
+    }
+
+
+    input.check {
+        border: 2px solid #0b147b;
+        border-radius: 0;
+        background: #fff;
+        border-radius: 5px;
+        height: 40px;
+        width: 55px;
+        font-size: 1.0rem;
+        margin-top: 5px;
+    }
+
+    input.check:hover {
+        color: #fff;
+        background: #0b147b;
+    }
 </style>
 
 <body>
     <main>
         <h1>単語練習ノート</h1>
         <h2>単語帳入力</h2>
-        <form onsubmit="showAlert(); return false;">
-            日本語の意味： <input type="text" id="japanese" placeholder="りんご" />
+        <form class="font" onsubmit="showAlert(); return false;">
+            日本語の意味： <input class="image" type="text" id="japanese" placeholder="りんご" />
             <br>
-            英単語： <input type="text" id="english" placeholder="apple" />
+            英単語　　　： <input class="image" type="text" id="english" placeholder="apple" />
             <br>
-            <input type="submit" value="保存" />
-            <input type="reset" value="formを空欄に戻す" />
+            <input class="button" type="submit" value="保存" />
+            <input class="button" type="reset" value="formを空欄に戻す" />
         </form>
+
+        <h2>単語カード検索</h2>
+        <form class="font" onsubmit="searchWord(); return false;">
+            検索したい単語を入力してください：<input class="image" type="text" id="key-word" placeholder="りんご">
+            <br>
+            <input class="button" type="submit" id="search" value="検索" />
+        </form>
+        <div class="child" id="key-card.ja"></div>
+        <div class="child" id="key-card.eg"></div>
+        <div id="message"></div>
+        <div id="message_btn"></div>
 
         <h2>単語練習帳</h2>
         <div id="quiz-container"></div>
-        <div id="question"></div>
+        <div class="font" id="question"></div>
         <div id="start"></div>
-        <!-- <div id="quiz-text"></div> -->
-        <!-- <div id="answer-input"> -->
-        <input type="text" id="answer-input" placeholder="ここに答えを入力">
-        <!-- </div> -->
-        <!-- <button id="submit-btn" value="">答え合わせ</button> -->
-        <div type="submit" id="submit-btn"></div>
-        <!-- <div class="first_class"> -->
+        <input class="response" type="text" id="answer-input" placeholder="ここに答えを入力">
         <div id="reply"></div>
-        <!-- </div> -->
-        <!-- <div class="second_class"> -->
-        <div id="next"></div>
-        <!-- <div id="end-btn"></div> -->
+        <div class="button-container">
+            <div type="submit" id="submit-btn"></div>
+            <div id="next"></div>
+            <div id="end-btn"></div>
         </div>
         <div id="end"></div>
-        <div id="end-btn"></div>
         <div id="finish-btn"></div>
 
         <h2>単語カード</h2>
@@ -136,6 +238,21 @@
             <div id="shuffle-btn"></div>
             <div id="reset-btn"></div>
         </div>
+
+        <h2>練習ノート</h2>
+        <div id="container"></div>
+        <template id="flame-template">
+            <div class="flame">
+                <!-- りんご：apple -->
+                <!-- form -->
+                <!-- 確認ボタン -->
+                <div class="prc_word"></div>
+                <form class="flame-card" onsubmit="showCard(); return false;">
+                    <input class="image" type="text" placeholder="apple">
+                    <input class="check" type="submit" value="確認">
+                </form>
+            </div>
+        </template>
     </main>
     <script src="script.js"></script>
 </body>

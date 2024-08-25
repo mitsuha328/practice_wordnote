@@ -16,18 +16,19 @@ function showAlert() {
         resetQuiz();
     }
     showList(shuffledArray);
+    practiceNote()
     storage.store = JSON.stringify(wordList);
 }
-addEventListener('load', function () {
-    if (storage.store === undefined) {
-    } else {
-        wordList = JSON.parse(storage.store);
-        shuffledArray = wordList;
-        showList(shuffledArray);
-    }
+// addEventListener('load', function () {
+if (storage.store === undefined) {
+} else {
+    wordList = JSON.parse(storage.store);
+    shuffledArray = wordList;
+    showList(shuffledArray);
+    practiceNote()
 }
-);
-
+// }
+// );
 
 
 function searchWord() {
@@ -45,28 +46,30 @@ function searchWord() {
     for (const key of wordList) {
         if (key.Japan === KeyWord || key.America === KeyWord) {
             const KeyCard_1 = document.createElement('button');
+            KeyCard_1.setAttribute('id', 'card');
             document.getElementById('key-card.ja').appendChild(KeyCard_1);
             const KeyCard_2 = document.createElement('button');
+            KeyCard_2.setAttribute('id', 'card');
             document.getElementById('key-card.eg').appendChild(KeyCard_2);
 
             is_found = true;
             KeyCard_1.textContent = key.Japan;
-            KeyCard_2.textContent = key.America
+            KeyCard_2.textContent = key.America;
             KeyCard_1.style.display = 'block';
             KeyCard_2.style.display = 'block';
             KeyCard_1.addEventListener('click', function () {
-                remove(KeyWord, 'Japan');
+                remove(key.Japan, key.America);
                 resetSearch();
             });
             KeyCard_2.addEventListener('click', function () {
-                remove(KeyWord, 'Japan');
+                remove(key.Japan, key.America);
                 resetSearch();
             });
         }
     }
     if (!is_found) {
         Message.style.display = 'block';
-        Message.textContent = `${KeyWord}は単語帳に存在しません。`
+        Message.textContent = `"${KeyWord}"は単語帳に存在しません。`
     }
 
     Message_button.addEventListener('click', function () {
@@ -293,39 +296,29 @@ function showList(List) {
         ja_element.id = item.Japan
         ja_element.classList.add('word_card')
         ja_element.innerText = item.Japan
-        ja_element.innerHTML = `<button onclick="remove('${item.Japan}', 'Japan')" id=btn>${item.Japan}</button>`
+        ja_element.innerHTML = `<button onclick="remove('${item.Japan}', '${item.America}')" id=btn>${item.Japan}</button>`
         memo1_element.prepend(ja_element);//memoにnew_elementを追加
 
         let eg_element = document.createElement('p');//p要素作る
         eg_element.id = item.America
         eg_element.classList.add('word_card')
         eg_element.innerText = item.America
-        eg_element.innerHTML = `<button onclick="remove('${item.America}', 'America')" id=btn>${item.America}</button>`
+        eg_element.innerHTML = `<button onclick="remove('${item.Japan}', '${item.America}')" id=btn>${item.America}</button>`
         memo2_element.prepend(eg_element);//memoにnew_elementを追加
     }
 }
 
 
-//remove関数はボタンのp要素(親)ごと消す
-function remove(card, language) {
+
+//remove関数に日本語と英語どちらも入れて、どちらもの値が一致するリストの配列があれば、そのindexを取得し、listから削除する。
+function remove(Japanese, English) {
     const question = confirm('このカードを削除しますか?');
     if (question == true) {
-        // const parentElement = event.target.parentElement;
-        const word = card;
+        const word = { Japan: Japanese, America: English };
+        const index = wordList.findIndex(item => item.Japan === word.Japan && item.America === word.America);
 
-        const index = wordList.findIndex(item => item[language] == word);
-
-        if (index !== -1) {
+        if (index >= 0) {
             wordList.splice(index, 1);
-        }
-
-
-        //languageの値がJapanならAmericaをそうでなければJapanを返す
-        const counterpartLanguage = language === 'Japan' ? 'America' : 'Japan';
-        const counterpartIndex = wordList.findIndex(item => item[counterpartLanguage] == word);
-
-        if (counterpartIndex !== -1) {
-            wordList.splice(counterpartIndex, 1);
         }
 
         shuffledArray = wordList;
@@ -339,10 +332,57 @@ function remove(card, language) {
         storage.store = JSON.stringify(wordList);
 
         showList(shuffledArray);
+        practiceNote()
     }
     else {
     }
 }
 
 
+function practiceNote() {
+    const container = document.getElementById('container');
+    const template = document.getElementById('flame-template').content;
 
+    container.innerHTML = '';
+
+    // div要素を生成してコンテナに追加する関数
+    function createDiv(index) {
+        // テンプレートを複製
+        const clone = document.importNode(template, true);
+
+        // 複製した要素にインデックスを設定
+        const div = clone.querySelector('.flame');
+        div.id = `flame-card-${index}`;
+
+        const prcWord = clone.querySelector('.prc_word');
+        prcWord.id = `practice-word-${index}`;
+        prcWord.innerHTML = `${wordList[index].Japan}:${wordList[index].America}`;
+
+        const inputWord = clone.querySelector('.image');
+        inputWord.id = `word-${index}`;
+
+        const searchBtn = clone.querySelector('.check');
+        searchBtn.dataset.index = index;
+        searchBtn.id = `search-btn-${index}`;
+
+        const form = clone.querySelector('form');
+        form.onsubmit = function (event) {
+            showCard(event, index);
+        };
+
+        // コンテナに追加
+        container.appendChild(clone);
+
+        function showCard(event, index) {
+            event.preventDefault();
+            if (inputWord.value === wordList[index].America) {
+                inputWord.value = '';
+            } else { }
+        }
+    }
+
+
+    for (let i = 0; i < wordList.length; i++) {
+        createDiv(i)
+    }
+}
