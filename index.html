@@ -8,6 +8,11 @@
     <title>単語練習ノート</title>
 </head>
 <style>
+    body {
+        background-color: #e1e3e759;
+        /* 背景色を水色に設定 */
+    }
+
     .parent {
         height: 250px;
         width: 500px;
@@ -106,6 +111,38 @@
         gap: 5px;
     }
 
+    .shuffle-button {
+        height: 35px;
+        width: 130px;
+        font-size: 15px;
+        /* padding-left: 8px;
+        padding-right: 8px; */
+        border: 1px solid rgb(1, 24, 82);
+        border-radius: 2px;
+        background: #fff;
+    }
+
+    .shuffle-button:hover {
+        color: #fff;
+        background: rgb(1, 24, 82);
+    }
+
+    .white-button {
+        height: 35px;
+        width: 230px;
+        font-size: 15px;
+        /* padding-left: 8px;
+        padding-right: 8px; */
+        border: 1px solid rgb(1, 24, 82);
+        border-radius: 2px;
+        background: #fff;
+    }
+
+    .white-button:hover {
+        color: #fff;
+        background: rgb(1, 24, 82);
+    }
+
     .first-class {
         display: flex;
         gap: 5px;
@@ -189,6 +226,43 @@
         color: #fff;
         background: #0b147b;
     }
+
+
+    button.start-btn {
+        height: 40px;
+        width: 120px;
+        color: #fff;
+        border: 2px solid #fff;
+        border-radius: 0;
+        background-image: -webkit-gradient(linear, left top, right top, from(#7463f8), to(#86c0fd));
+        background-image: -webkit-linear-gradient(left, #7463f8 0%, #86c0fd 100%);
+        background-image: linear-gradient(to right, #7463f8 0%, #86c0fd 100%);
+        -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, .1);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, .1);
+    }
+
+    button.start-btn:hover {
+        -webkit-transform: translate(0, -2px);
+        transform: translate(0, -2px);
+        color: #fff;
+        -webkit-box-shadow: 0 8px 15px rgba(0, 0, 0, .2);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, .2);
+    }
+
+    .button {
+        height: 35px;
+        font-size: 15px;
+        padding-left: 8px;
+        padding-right: 8px;
+        border: 1px solid rgb(1, 24, 82);
+        border-radius: 2px;
+        background: #fff;
+    }
+
+    .button:hover {
+        color: #fff;
+        background: rgb(1, 24, 82);
+    }
 </style>
 
 <body>
@@ -198,7 +272,7 @@
         <form class="font" onsubmit="showAlert(); return false;">
             日本語の意味： <input class="image" type="text" id="japanese" placeholder="りんご" />
             <br>
-            英単語　　　： <input class="image" type="text" id="english" placeholder="apple" />
+            英構文　　　： <input class="image" type="text" id="english" placeholder="apple" />
             <br>
             <input class="button" type="submit" value="保存" />
             <input class="button" type="reset" value="formを空欄に戻す" />
@@ -236,13 +310,16 @@
         </div>
         <div class="button-container">
             <div id="shuffle-btn"></div>
-            <div id="reset-btn"></div>
             <div id="white-btn"></div>
+        </div>
+        <div class="button-container">
+            <div id="reset-btn"></div>
             <div id="block-btn"></div>
         </div>
 
         <h2>練習ノート</h2>
         <div id="container"></div>
+        <div id="text"></div>
         <template id="flame-template">
             <div class="flame">
                 <!-- りんご：apple -->

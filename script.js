@@ -3,6 +3,7 @@ const storage = localStorage;
 let shuffledArray = [...wordList];
 let quizList = []
 let QuestionList = []
+let missList = []
 
 function showAlert() {
     let x = 0;
@@ -56,6 +57,7 @@ function searchWord() {
     Search.style.display = 'none';
     let is_found = false;
     Message_button.textContent = '終了する'
+    Message_button.classList.add('button');
     Message_button.style.display = 'block';
     for (const key of wordList) {
         if (key.Japan === KeyWord || key.America === KeyWord) {
@@ -118,12 +120,14 @@ const Second = document.getElementsByClassName('second-class');
 
 const finishButton = document.createElement('button');
 document.getElementById('finish-btn').appendChild(finishButton);
+finishButton.classList.add('button');
 finishButton.textContent = '終了する';
 finishButton.style.display = 'none';
 let check_quiz = 0;
 
 const endButton = document.createElement('button');
 document.getElementById('end-btn').appendChild(endButton);
+endButton.classList.add('button');
 endButton.textContent = 'やめる';
 endButton.style.display = 'none';
 endButton.addEventListener('click', function () {
@@ -139,6 +143,7 @@ endButton.addEventListener('click', function () {
 
 const shuffleButton = document.createElement('button');
 document.getElementById('shuffle-btn').appendChild(shuffleButton);
+shuffleButton.classList.add('shuffle-button');
 shuffleButton.textContent = 'シャッフルする';
 shuffleButton.addEventListener('click', function () {
     shuffledArray = shuffleArray(wordList);
@@ -163,11 +168,10 @@ function shuffleArray(array) {
 //リセットする
 const resetButton = document.createElement('button');
 document.getElementById('reset-btn').appendChild(resetButton);
+resetButton.classList.add('shuffle-button');
 resetButton.textContent = 'リセットする';
 resetButton.addEventListener('click', function () {
-    console.log(shuffledArray);
     shuffledArray = [...wordList];
-    console.log(wordList);
     showList(shuffledArray);
     if (check_quiz === 1) {
         alert('内容が変更されたため、単語練習帳を終了します。');
@@ -178,6 +182,7 @@ resetButton.addEventListener('click', function () {
 //全てのカードを有効にする
 const whiteButton = document.createElement('button');
 document.getElementById('white-btn').appendChild(whiteButton);
+whiteButton.classList.add('white-button');
 whiteButton.textContent = '全てのカードを有効にする';
 whiteButton.addEventListener('click', function () {
     for (let i = 0; i < wordList.length; i++) {
@@ -190,6 +195,7 @@ whiteButton.addEventListener('click', function () {
 //全てのカードを無効にする
 const blockButton = document.createElement('button');
 document.getElementById('block-btn').appendChild(blockButton);
+blockButton.classList.add('white-button');
 blockButton.textContent = '全てのカードを無効にする';
 blockButton.addEventListener('click', function () {
     for (let i = 0; i < wordList.length; i++) {
@@ -201,12 +207,12 @@ blockButton.addEventListener('click', function () {
 
 
 //答え合わせがEnterで反応するようにする
-answerInput.addEventListener('keydown', text_event);
-function text_event(e) {
-    if (e.key === 'Enter') {
-        Check();
-    }
-}
+// answerInput.addEventListener('keydown', text_event);
+// function text_event(e) {
+//     if (e.key === 'Enter') {
+//         Check();
+//     }
+// }
 
 function showNextQuestion() {
     replyElement.textContent = '';
@@ -244,15 +250,18 @@ function resetQuiz() {
     submitButton.style.display = 'none';
     replyElement.style.display = 'none';
     endButton.style.display = 'none';
+    miss = 0;
     check_quiz = 0;
     shuffledArray = [...wordList];
     quizList = [];
     QuestionList = [];
+    practiceNote()
     showList(shuffledArray);
 }
 
 const submitButton = document.createElement('button');
 document.getElementById('submit-btn').appendChild(submitButton);
+submitButton.classList.add('button');
 submitButton.textContent = '答え合わせ';
 submitButton.style.display = 'none';
 
@@ -260,6 +269,7 @@ submitButton.addEventListener('click', Check);
 
 let count = 0;
 let right = 0;
+let miss = 0;
 function Check() {
     const userAnswer = answerInput.value.trim().toLowerCase();
     const correctAnswer = QuestionList[currentQuestionIndex].America.toLowerCase();
@@ -269,25 +279,38 @@ function Check() {
         replyElement.textContent = '正解!';
         submitButton.style.display = 'none';
         nextButton.style.display = 'block';
-        count += 1;
-        right += 1;
+        if (miss == 0) {
+            count += 1;
+            right += 1;
+        } else {
+            miss = 0;
+        }
     } else {
         replyElement.textContent = `不正解。正解は「${QuestionList[currentQuestionIndex].America}」です。`;
-        submitButton.style.display = 'none';
         nextButton.style.display = 'block';
-        count += 1;
+        if (miss == 0) {
+            missList.push({
+                Japan: QuestionList[currentQuestionIndex].Japan,
+                America: QuestionList[currentQuestionIndex].America
+            })
+            miss = 1;
+            count += 1;
+        }
     }
 };
 
 const nextButton = document.createElement('button');
 nextButton.textContent = '次の問題';
+nextButton.classList.add('button');
 nextButton.style.display = 'none';
 nextButton.addEventListener('click', function () {
     submitButton.style.display = 'block';
     nextButton.style.display = 'none';
+    miss = 0;
     showNextQuestion();
 });
 document.getElementById('next').appendChild(nextButton);
+nextButton.classList.add('button');
 
 function showQuestion() {
     const currentQuestion = QuestionList[currentQuestionIndex];
@@ -298,8 +321,10 @@ function showQuestion() {
 
 const startButton = document.createElement('button');
 startButton.textContent = 'スタート';
+startButton.classList.add('start-btn');
 answerInput.style.display = 'none';
 startButton.addEventListener('click', function () {
+    missList = [];
     for (let i = 0; i < shuffledArray.length; i++) {
         if (shuffledArray[i].check === 0) {
             let Question = { Japan: shuffledArray[i].Japan, America: shuffledArray[i].America }
@@ -311,7 +336,6 @@ startButton.addEventListener('click', function () {
             let newItem = { Japan: shuffledArray[i].Japan, America: '×', check: shuffledArray[i].check };
             quizList.push(newItem);
         }
-        console.log(quizList);
         showList(quizList);
         startButton.style.display = 'none';
         quizContainer.style.display = 'block';
@@ -366,28 +390,31 @@ function showList(List) {
         eg_element.innerHTML = `<button onclick="remove('${item.Japan}', '${item.America}')" id=btn-${cleanAmerica} class="btn">${item.America}</button>`;
         // eg_element.innerHTML = `<button contextmenu="change('${item.Japan}', '${item.America}')" id=btn>${item.America}</button>`
         memo2_element.prepend(eg_element);//memoにnew_elementを追加
+
     }
 
-    addEventListener('contextmenu', function (event) {
-        event.preventDefault();
-        let str = event.target.id;
-        let Japan_id = 0;
-        let America_id = 0;
-        if (str.endsWith('-Japan')) {
-            Japan_id = str;
-            America_id = str.slice(0, -6) + '-America'; // '-Japan'の6文字を削除して'-America'に
-        } else if (str.endsWith('-America')) {
-            America_id = str;
-            Japan_id = str.slice(0, -8) + '-Japan'; // '-America'の8文字を削除して'-Japan'に
-        } else { }
-
-        const Japan_text = document.getElementById(Japan_id).textContent;
-        const America_text = document.getElementById(America_id).textContent;
-        change(Japan_id, America_id, Japan_text, America_text)
-    })
 
     changeCardleroad(List);
 }
+
+addEventListener('contextmenu', function (event) {
+    event.preventDefault();
+    let str = event.target.id;
+    let Japan_id = 0;
+    let America_id = 0;
+    if (str.endsWith('-Japan')) {
+        Japan_id = str;
+        America_id = str.slice(0, -6) + '-America'; // '-Japan'の6文字を削除して'-America'に
+    } else if (str.endsWith('-America')) {
+        America_id = str;
+        Japan_id = str.slice(0, -8) + '-Japan'; // '-America'の8文字を削除して'-Japan'に
+    } else { }
+
+    const Japan_text = document.getElementById(Japan_id).textContent;
+    const America_text = document.getElementById(America_id).textContent;
+    change(Japan_id, America_id, Japan_text, America_text)
+})
+
 
 function assignUniqueID(baseID) {
     let newID = baseID + '-1';
@@ -408,8 +435,6 @@ function assignUniqueID(baseID) {
 function change(Japanese_id, English_id, Japanese_text, English_text) {
     for (let i = 0; i < wordList.length; i++) {
         if (wordList[i].Japan === Japanese_text && wordList[i].America === English_text) {
-            console.log(Japanese_id);
-            console.log(English_id);
             const jaButton = document.getElementById(Japanese_id);
             const enButton = document.getElementById(English_id);
             if (wordList[i].check === 0) {
@@ -431,17 +456,15 @@ function change(Japanese_id, English_id, Japanese_text, English_text) {
             }
             // 変更された後にローカルストレージを更新
             storage.store = JSON.stringify(wordList);
-            console.log(shuffledArray);
             break;
         }
     }
 }
 
-// 日本語と英語の組み合わせが全く同じカードが2ペア以上あるときにそのペアに対してchange関数が呼び出されると正しく動作しない
 
 function changeCardleroad(list) {
+    const existingIDs = new Set();
     function assignUniqueID_roadver(baseID) {
-        const existingIDs = new Set();
         let counter = 1;
         let newID = `${baseID}-${counter}`;
         // IDがすでに存在する場合、末尾にカウンターを増やしていく
@@ -499,57 +522,67 @@ function remove(Japanese, English) {
         storage.store = JSON.stringify(wordList);
 
         showList(shuffledArray);
-        practiceNote()
+        // practiceNote()
     }
     else {
     }
 }
 
 function practiceNote() {
+    const Text = document.getElementById('text');
+    Text.textContent = '練習ノートには単語練習帳で間違えた問題が表示されます。'
+    Text.style.display = 'none';
     const container = document.getElementById('container');
     const template = document.getElementById('flame-template').content;
+    if (missList.length == 0) {
+        container.style.display = 'none';
+        Text.style.display = 'block';
+    } else {
 
-    container.innerHTML = '';
+        container.style.display = 'block';
 
-    // div要素を生成してコンテナに追加する関数
-    function createDiv(index) {
-        // テンプレートを複製
-        const clone = document.importNode(template, true);
+        container.innerHTML = '';
 
-        // 複製した要素にインデックスを設定
-        const div = clone.querySelector('.flame');
-        div.id = `flame-card-${index}`;
+        // div要素を生成してコンテナに追加する関数
+        function createDiv(index) {
+            // テンプレートを複製
+            const clone = document.importNode(template, true);
 
-        const prcWord = clone.querySelector('.prc_word');
-        prcWord.id = `practice-word-${index}`;
-        prcWord.innerHTML = `${wordList[index].Japan}:${wordList[index].America}`;
+            // 複製した要素にインデックスを設定
+            const div = clone.querySelector('.flame');
+            div.id = `flame-card-${index}`;
 
-        const inputWord = clone.querySelector('.image');
-        inputWord.id = `word-${index}`;
-        inputWord.placeholder = wordList[index].America;
+            const prcWord = clone.querySelector('.prc_word');
+            prcWord.id = `practice-word-${index}`;
+            prcWord.innerHTML = `${missList[index].Japan}:${missList[index].America}`;
 
-        const searchBtn = clone.querySelector('.check');
-        searchBtn.dataset.index = index;
-        searchBtn.id = `search-btn-${index}`;
+            const inputWord = clone.querySelector('.image');
+            inputWord.id = `word-${index}`;
+            inputWord.placeholder = missList[index].America;
 
-        const form = clone.querySelector('form');
-        form.onsubmit = function (event) {
-            showCard(event, index);
-        };
+            const searchBtn = clone.querySelector('.check');
+            searchBtn.dataset.index = index;
+            searchBtn.id = `search-btn-${index}`;
 
-        // コンテナに追加
-        container.appendChild(clone);
+            const form = clone.querySelector('form');
+            form.onsubmit = function (event) {
+                showCard(event, index);
+            };
 
-        function showCard(event, index) {
-            event.preventDefault();
-            if (inputWord.value === wordList[index].America) {
-                inputWord.value = '';
-            } else { }
+            // コンテナに追加
+            container.appendChild(clone);
+
+            function showCard(event, index) {
+                event.preventDefault();
+                if (inputWord.value === missList[index].America) {
+                    inputWord.value = '';
+                } else { }
+            }
         }
-    }
 
 
-    for (let i = 0; i < wordList.length; i++) {
-        createDiv(i)
+        for (let i = 0; i < missList.length; i++) {
+            createDiv(i)
+        }
     }
 }
